@@ -3,11 +3,20 @@
 
 #include <vector>
 #include <boost/shared_ptr.hpp>
+#include <jack/jack.h>
 
 #include <module.h>
 
 struct state 
 {
+	unsigned int polyphony;
+	
+	state(unsigned int polyphony = 1) :
+		polyphony(polyphony)
+	{
+		
+	}
+	
 	std::vector<module_ptr> modules;
 	
 	void connect(
@@ -25,6 +34,10 @@ struct state
 		float value
 	) {
 		
+	}
+	
+	int process(jack_nframes_t nframes) {
+		return 0;
 	}
 };
 

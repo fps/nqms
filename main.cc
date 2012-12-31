@@ -1,11 +1,14 @@
 #include <boost/program_options.hpp>
+#include <boost/bind.hpp>
 
 #include <iostream>
 #include <string>
+#include <fstream>
 #include <stdexcept>
 #include <cstdlib>
 
 #include <engine.h>
+#include <assign.h>
 
 int main(int argc, char *argv[]) 
 {
@@ -13,6 +16,8 @@ int main(int argc, char *argv[])
 	using std::cout;
 	using std::cerr;
 	using std::endl;
+	using std::ifstream;
+	using std::getline;
 	using std::string;
 	using std::runtime_error;
 	using std::exception;
@@ -21,7 +26,6 @@ int main(int argc, char *argv[])
 	
 	desc.add_options()
 		("help,h", "Display help output")
-		("load,l", po::value<string>(), "Load a patch file")
 		("polyphony,p", po::value<int>()->default_value(1), "Set an initial polyphony for the patch")
 		;
 		
@@ -48,7 +52,18 @@ int main(int argc, char *argv[])
 	
 	try 
 	{
-		engine e(1024, 1024);
+		engine e;
+		
+		state_ptr new_state(new state(vm["polyphony"].as<int>()));		
+		e.set_state(new_state);
+		
+		ifstream input("/dev/stdin");
+		
+		while(input.good()) {
+			string line;
+			getline(input, line);
+			cout << line << endl;
+		}
 	} 
 	
 	catch (runtime_error e) {
