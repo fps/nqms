@@ -28,4 +28,7 @@ struct state
 	}
 };
 
+
+typedef boost::shared_ptr<state> state_ptr;
+
 #endif

@@ -30,7 +30,7 @@ struct ringbuffer {
 		std::cout << "write space: " << jack_ringbuffer_write_space(jack_ringbuffer) << std::endl;
 
 		for (unsigned int i = 0; i < size; ++i) {
-			T *t = new (jack_ringbuffer->buf + sizeof(T) * i) T();
+			new (jack_ringbuffer->buf + sizeof(T) * i) T();
 		}
 	}
 
