@@ -12,6 +12,8 @@ Strings of the form $PARAMETER  denote a parameter. ${PARAMETER} denotes an opti
 
 ### list
 
+> list
+
 Lists all modules loaded at the current time. The output is of the form
 
 [0] LADSPA '/usr/lib/ladspa/foo.so' 'plugin label'
@@ -23,6 +25,12 @@ Lists all modules loaded at the current time. The output is of the form
 
 
 [1] MIDI 
+
+### list_modules
+
+> list_modules
+
+Lists all available modules on the system.
 
 #### Notes:
 
@@ -72,12 +80,12 @@ Establishes connections between modules.
 
 ### load
 
-> load $FILE_NAME
+> load [$FILE_NAME]
 
-Clears the current patch and loads a patch from the file $FILE_NAME.
+Clears the current patch and loads a patch from the file $FILE_NAME. If $FILE_NAME is omitted the last used file name is used.
 
 ### save
 
 > save [$FILE_NAME]
 
-Saves a patch file to the file $FILE_NAME
+Saves a patch file to the file $FILE_NAME. If $FILE_NAME is not specified the last used file name is used.
