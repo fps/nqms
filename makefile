@@ -13,6 +13,6 @@ LDFLAGS ?= `pkg-config --libs QtCore QtDBus jack` -lboost_program_options  -Wl,-
 
 all: nqms
 
-nqms: main.cc
+nqms: main.cc module.h state.h ladspa_module.h engine.h makefile
 	$(CXX) $(CXXFLAGS) -o nqms main.cc $(LDFLAGS)
 

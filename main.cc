@@ -35,7 +35,7 @@ int main(int argc, char *argv[])
 			cout << desc << endl;
 			return(EXIT_SUCCESS);
 		}
-		
+	
 		po::notify(vm);
 	} 
 	
@@ -48,7 +48,7 @@ int main(int argc, char *argv[])
 	
 	try 
 	{
-		engine e;
+		engine e(1024, 1024);
 	} 
 	
 	catch (runtime_error e) {
