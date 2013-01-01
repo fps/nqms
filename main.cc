@@ -54,7 +54,7 @@ int main(int argc, char *argv[])
 	
 	try 
 	{
-		engine e;
+		engine e(vm["control-period"].as<int>());
 		
 #if 0
 		//! TEST
@@ -73,6 +73,11 @@ int main(int argc, char *argv[])
 			e.set_state(new_state6);
 		}
 #endif
+
+		{
+			ladspa_module_ptr module(new ladspa_module("/usr/lib/ladspa/calf.so", "Compressor", vm["polyphony"].as<int>()));
+			e.add_module(module);
+		}
 
 		ifstream input("/dev/stdin");
 		

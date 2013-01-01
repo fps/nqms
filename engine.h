@@ -4,15 +4,17 @@
 #include <vector>
 #include <list>
 #include <boost/function.hpp>
+#include <boost/shared_ptr.hpp>
 #include <stdexcept>
 #include <jack/jack.h>
 #include <iostream>
 #include <unistd.h>
+#include <map>
 
-#include <state.h>
 #include <ringbuffer.h>
 #include <assign.h>
 #include <disposable.h>
+#include <module.h>
 
 extern "C" {
 	int process(jack_nframes_t nframes, void *arg);
@@ -20,18 +22,24 @@ extern "C" {
 
 struct engine 
 {
+	jack_client_t *jack_client;
+	
 	ringbuffer<boost::function<void()> > cmds;
 	ringbuffer<int> acks;
 	
 	std::list<disposable_ptr> heap;
 	
-	std::list<module_ptr> modules;
+	boost::shared_ptr<std::list<module_ptr> > modules;
+	std::map<module_ptr, std::vector<jack_port_t*> > module_jack_ports;
 	
-	jack_client_t *jack_client;
+	unsigned int control_period;
+	unsigned int elapsed_frames;
 	
-	engine() :
+	engine(unsigned int control_period) 
+	:
 		cmds(1024),
-		the_state(new state) 
+		acks(1024),
+		elapsed_frames(0)
 	{
 		std::cerr << "Engine starting up..." << std::endl;
 		jack_status_t status;
@@ -46,24 +54,38 @@ struct engine
 		jack_activate(jack_client);
 	}
 	
-	~engine() {
+	~engine() 
+	{
 		std::cerr << "Engine shutting down..." << std::endl;
 
 		jack_deactivate(jack_client);
 		jack_client_close(jack_client);
 	}
 	
-	int process(jack_nframes_t nframes) {
-		if(cmds.can_read()) {
+	int process(jack_nframes_t nframes) 
+	{
+		if(cmds.can_read()) 
+		{
 			// std::cerr << "cmd" << std::endl;
 			cmds.read()();
 			acks.write(0);
 		}
 		
-		return the_state->process(nframes);
+		for 
+		(
+			std::list<module_ptr>::iterator it = modules->begin();
+			it != modules->end();
+			++it
+		)
+		{
+			(*it)->process(nframes);
+		}
+		
+		return 0;
 	}
 	
-	void wait_for_ack() {
+	void wait_for_ack() 
+	{
 		while(false == acks.can_read()) {
 			usleep(10000);
 		}
@@ -72,12 +94,8 @@ struct engine
 		acks.read();
 	}
 	
-	void set_state(state_ptr new_state) {
-		heap.push_back(new_state);
-		write_cmd(assign_and_clear(the_state, new_state));
-	}
-	
-	void write_cmd(boost::function<void()> f) {
+	void write_cmd(boost::function<void()> f) 
+	{
 		while(false == cmds.can_write()) {
 			usleep(10000);
 		}
@@ -89,7 +107,8 @@ struct engine
 	 * TODO: call this regularly from a thread and 
 	 * protect the way to add to it with a mutex
 	 */
-	void cleanup_heap() {
+	void cleanup_heap() 
+	{
 		for (
 			std::list<disposable_ptr>::iterator it = heap.begin();
 			it != heap.end();
@@ -106,11 +125,45 @@ struct engine
 			}
 		}
 	}
+	
+	void add_module(module_ptr module)
+	{
+		/**
+		 * Create jack ports for module
+		 */
+		
+		
+		/**
+		 * Create new modules list from old one
+		 */
+		
+		
+		/**
+		 * Assign the new one
+		 */
+	}
+	
+	void remove_module(unsigned int index) 
+	{
+		/**
+		 * Create new modules list
+		 */
+		
+		
+		/**
+		 * Assign it
+		 */
+		
+		/**
+		 * Remove the module's jack ports
+		 */
+	}
 };
 
 
 extern "C" {
-	int process(jack_nframes_t nframes, void *arg) {
+	int process(jack_nframes_t nframes, void *arg) 
+	{
 		return ((engine*)arg)->process(nframes);
 	}
 }

@@ -60,11 +60,15 @@ struct ladspa_module : module
 		
 	}
 	
+	virtual void process(jack_nframes_t nframes)
+	{
+		
+	}
+	
 	static std::pair<std::string, std::string> find_plugin(std::string label_regex) {
 		return std::make_pair("", "");
 	}
 };
-
 
 #endif
 

@@ -41,6 +41,8 @@ struct module : disposable
 	/**
 	 * Precondition: in_port_buffers and out_port_buffers have to point
 	 * to valid locations..
+	 * 
+	 * No assumptions about nframes can be done by the module.
 	 */
 	virtual void process(jack_nframes_t nframes) = 0;
 };
