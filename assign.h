@@ -25,7 +25,7 @@ struct assign_and_clear_fun {
 	T t;
 	T empty_t;
 	
-	assign_and_clear_fun(U &u, const T& t) : u(u), t(t), empty_t(T()) { }
+	assign_and_clear_fun(U &u, const T& t) : u(u), t(t) { }
 
 	void operator()() { 
 		u = t; 

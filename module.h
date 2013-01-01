@@ -3,31 +3,46 @@
 
 #include <boost/shared_ptr.hpp>
 #include <jack/types.h>
-
 #include <string>
+#include <vector>
 
-struct module 
+#include <disposable.h>
+
+struct module : disposable
 {
+	/**
+	 * Subclasses must resize these to the
+	 * correct sizes..
+	 */
+	std::vector<float*> in_port_buffers;
+	std::vector<float*> out_port_buffers;
+	
+	/**
+	 * Subclasses must fill these with
+	 * the correct information
+	 */
+	std::vector<std::string> in_port_names;
+	std::vector<std::string> out_port_names;
+
+	std::vector<std::string> in_port_descriptions;
+	std::vector<std::string> out_port_descriptions;
+
+	/**
+	 * Values that get added to the input. These 
+	 * should be set to default values by subclasses.
+	 */
+	std::vector<float> in_port_values;
+		
 	virtual ~module() 
 	{ 
 		
 	}
 	
+	/**
+	 * Precondition: in_port_buffers and out_port_buffers have to point
+	 * to valid locations..
+	 */
 	virtual void process(jack_nframes_t nframes) = 0;
-	
-	virtual unsigned int number_of_output_ports() = 0;
-	virtual unsigned int number_of_input_ports() = 0;
-	
-	virtual std::string get_input_port_name(unsigned int index) = 0;
-	virtual std::string get_output_port_name(unsigned int index) = 0;
-
-	virtual std::string get_input_port_description(unsigned int index) = 0;
-	virtual std::string get_output_port_description(unsigned int index) = 0;
-
-	virtual std::string get_input_port_jack_name(unsigned int index) = 0;
-	virtual std::string get_output_port_jack_name(unsigned int index) = 0;
-	
-	virtual void set_port_value(unsigned int index, float value) = 0;
 };
 
 typedef boost::shared_ptr<module> module_ptr;

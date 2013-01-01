@@ -2,14 +2,19 @@
 #define NQMS_STATE_HH
 
 #include <vector>
+#include <map>
+#include <utility>
 #include <boost/shared_ptr.hpp>
 #include <jack/jack.h>
 
 #include <module.h>
+#include <disposable.h>
 
-struct state 
+struct state : disposable
 {
 	unsigned int polyphony;
+	
+	std::map<std::pair<unsigned int, unsigned int>, std::pair<unsigned int, unsigned int> > connections;
 	
 	state(unsigned int polyphony = 1) :
 		polyphony(polyphony)

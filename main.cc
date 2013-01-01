@@ -9,6 +9,7 @@
 
 #include <engine.h>
 #include <assign.h>
+#include <ladspa_module.h>
 
 int main(int argc, char *argv[]) 
 {
@@ -26,7 +27,8 @@ int main(int argc, char *argv[])
 	
 	desc.add_options()
 		("help,h", "Display help output")
-		("polyphony,p", po::value<int>()->default_value(1), "Set an initial polyphony for the patch")
+		("polyphony,p", po::value<int>()->default_value(1), "Polyphony for the patch")
+		("control-period,c", po::value<int>()->default_value(1), "The period (samples) for control rate signals")
 		;
 		
 	po::variables_map vm;
@@ -54,15 +56,32 @@ int main(int argc, char *argv[])
 	{
 		engine e;
 		
-		state_ptr new_state(new state(vm["polyphony"].as<int>()));		
-		e.set_state(new_state);
-		
+#if 0
+		//! TEST
+		{
+			state_ptr new_state1(new state(vm["polyphony"].as<int>()));
+			e.set_state(new_state1);
+			state_ptr new_state2(new state(vm["polyphony"].as<int>()));
+			e.set_state(new_state2);
+			state_ptr new_state3(new state(vm["polyphony"].as<int>()));
+			e.set_state(new_state3);
+			state_ptr new_state4(new state(vm["polyphony"].as<int>()));
+			e.set_state(new_state4);
+			state_ptr new_state5(new state(vm["polyphony"].as<int>()));
+			e.set_state(new_state5);
+			state_ptr new_state6(new state(vm["polyphony"].as<int>()));
+			e.set_state(new_state6);
+		}
+#endif
+
 		ifstream input("/dev/stdin");
 		
 		while(input.good()) {
 			string line;
 			getline(input, line);
 			cout << line << endl;
+			
+			e.cleanup_heap();
 		}
 	} 
 	

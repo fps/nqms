@@ -12,6 +12,7 @@
 #include <state.h>
 #include <ringbuffer.h>
 #include <assign.h>
+#include <disposable.h>
 
 extern "C" {
 	int process(jack_nframes_t nframes, void *arg);
@@ -20,10 +21,11 @@ extern "C" {
 struct engine 
 {
 	ringbuffer<boost::function<void()> > cmds;
+	ringbuffer<int> acks;
 	
-	std::list<state_ptr> state_heap;
+	std::list<disposable_ptr> heap;
 	
-	state_ptr the_state;
+	std::list<module_ptr> modules;
 	
 	jack_client_t *jack_client;
 	
@@ -52,17 +54,56 @@ struct engine
 	}
 	
 	int process(jack_nframes_t nframes) {
+		if(cmds.can_read()) {
+			// std::cerr << "cmd" << std::endl;
+			cmds.read()();
+			acks.write(0);
+		}
+		
 		return the_state->process(nframes);
 	}
 	
+	void wait_for_ack() {
+		while(false == acks.can_read()) {
+			usleep(10000);
+		}
+		
+		// std::cerr << "ack" << std::endl;
+		acks.read();
+	}
+	
 	void set_state(state_ptr new_state) {
-		state_heap.push_back(new_state);
+		heap.push_back(new_state);
 		write_cmd(assign_and_clear(the_state, new_state));
 	}
 	
 	void write_cmd(boost::function<void()> f) {
 		while(false == cmds.can_write()) {
 			usleep(10000);
+		}
+		cmds.write(f);
+		wait_for_ack();
+	}
+	
+	/**
+	 * TODO: call this regularly from a thread and 
+	 * protect the way to add to it with a mutex
+	 */
+	void cleanup_heap() {
+		for (
+			std::list<disposable_ptr>::iterator it = heap.begin();
+			it != heap.end();
+		) {
+			// std::cerr << "unique?" << std::endl;
+			if ((*it).unique()) 
+			{
+				// std::cerr << "erasing" << std::endl;
+				it = heap.erase(it);
+			} 
+			else 
+			{
+				++it;
+			}
 		}
 	}
 };
