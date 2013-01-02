@@ -10,12 +10,6 @@
 
 namespace ladspapp 
 {
-	/**
-	* Create instances of this class using the
-	* ladspa_library class. Note that you MUST 
-	* not delete ladspa_library instance during the 
-	* lifetime of the ladspa_plugin. 
-	*/
 	struct ladspa_plugin
 	:
 		boost::noncopyable
