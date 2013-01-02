@@ -32,11 +32,6 @@ namespace ladspapp
 		:
 			the_library(the_library)	
 		{
-			if (false == the_library)
-			{
-				throw std::runtime_error("The library was not initialized");
-			}
-			
 			init();
 		}
 		
@@ -75,7 +70,7 @@ namespace ladspapp
 				
 				std::cerr << "Plugin: " << descriptor->Label << std::endl;
 				
-				ladspa_plugins.push_back(ladspa_plugin_ptr(new ladspa_plugin(descriptor)));
+				ladspa_plugins.push_back(ladspa_plugin_ptr(new ladspa_plugin(the_library, descriptor)));
 				++index;
 			}
 		}

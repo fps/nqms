@@ -104,7 +104,7 @@ namespace ladspapp
 					catch (std::runtime_error e) 
 					{
 						std::cerr << "Warning: could not load library: " << (*it).path().c_str() << " " << e.what() << std::endl;
-					}		
+					}
 				}
 			}
 		}

@@ -6,6 +6,8 @@
 #include <boost/utility.hpp>
 #include <ladspa.h>
 
+#include <library.h>
+
 namespace ladspapp 
 {
 	/**
@@ -18,15 +20,16 @@ namespace ladspapp
 	:
 		boost::noncopyable
 	{
+		library_ptr the_library;
 		const LADSPA_Descriptor *descriptor;
-		LADSPA_Handle instance;
 		
-		ladspa_plugin(const LADSPA_Descriptor *descriptor)
+		ladspa_plugin(library_ptr the_library, const LADSPA_Descriptor *descriptor)
 		throw 
 		(
 			std::runtime_error
 		)
 		:
+			the_library(the_library),
 			descriptor(descriptor)
 		{
 			

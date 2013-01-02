@@ -10,13 +10,16 @@
 
 namespace ladspapp 
 {
-	struct ladspa_plugin_instance : boost::noncopyable {
+	struct ladspa_plugin_instance 
+	: 
+		boost::noncopyable 
+	{
 		ladspa_plugin_ptr the_ladspa_plugin;
 		LADSPA_Handle handle;
 		
 		ladspa_plugin_instance
 		(
-			ladspa_plugin_ptr ladspa_plugin,
+			ladspa_plugin_ptr the_ladspa_plugin,
 			unsigned long samplerate
 		)
 		throw 
