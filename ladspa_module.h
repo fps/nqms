@@ -20,7 +20,7 @@ typedef boost::shared_ptr<ladspa_module> ladspa_module_ptr;
 
 struct ladspa_module : module
 {
-	ladspapp::ladspa_plugin plugin;
+	ladspapp::ladspa_plugin_ptr plugin;
 	
 	unsigned int samplerate;
 
@@ -29,7 +29,7 @@ struct ladspa_module : module
 
 	ladspa_module
 	(
-		ladspapp::ladspa_plugin plugin,
+		ladspapp::ladspa_plugin_ptr plugin,
 		unsigned int samplerate, 
 		unsigned int polyphony
 	) 

@@ -15,24 +15,41 @@ namespace ladspapp
 	* not delete ladspa_library instance during the 
 	* lifetime of the ladspa_plugin. 
 	*/
-	struct ladspa_plugin : boost::noncopyable 
+	struct ladspa_plugin
+	:
+		boost::noncopyable
 	{
 		const LADSPA_Descriptor *descriptor;
 		LADSPA_Handle instance;
 		
-		ladspa_plugin(const LADSPA_Descriptor *descriptor) 
+		ladspa_plugin(const LADSPA_Descriptor *descriptor)
+		throw 
+		(
+			std::runtime_error
+		)
 		:
 			descriptor(descriptor)
 		{
 			
 		}
 		
-		std::string label() {
+		std::string label() 
+		{
 			return descriptor->Label;
 		}
 		
-		void instantiate() {
-			
+		std::string name()
+		{
+			return descriptor->Name;
+		}
+		
+		unsigned long uid()
+		{
+			return descriptor->UniqueID;
+		}
+		
+		ladspa_plugin_instance_ptr instantiate() {
+			return ladspa_plugin_instance_ptr();
 		}
 	};
 	

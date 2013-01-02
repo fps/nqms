@@ -8,6 +8,7 @@
 #include <boost/shared_ptr.hpp>
 
 #include <ladspa_plugin.h>
+#include <library.h>
 
 namespace ladspapp 
 {
@@ -15,74 +16,50 @@ namespace ladspapp
 	* A simple wrapper class around a LADSPA library file
 	* to make some reoccuring work easier..
 	*/
-	struct ladspa_library : boost::noncopyable {
-		std::string library;
-		
-		std::vector<const LADSPA_Descriptor *> descriptors;
-		
-		LADSPA_Descriptor_Function ladspa_descriptor_fun;
-		
-		void *dl;
-		
-		/**
-		* Opens and loads a LADSPA library file..
-		* 
-		* Might throw std::runtime_error in case something went wrong..
-		*/
-		ladspa_library(std::string library, bool load_library = false) :
-			library(library),
-			dl(NULL)
-		{
-			std::cerr << "LADSPA library: " << library << std::endl;
+	struct ladspa_library 
+	: 
+		boost::noncopyable 
+	{
+		library_ptr the_library;
 
-			if (true == load_library) 
+		std::vector<ladspa_plugin_ptr> ladspa_plugins;
+		
+		ladspa_library(library_ptr the_library) 
+		throw 
+		(
+			std::runtime_error
+		)
+		:
+			the_library(the_library)	
+		{
+			if (false == the_library)
 			{
-				load();
+				throw std::runtime_error("The library was not initialized");
 			}
+			
+			init();
 		}
 		
-		/**
-		* Closes the library handle if nessecary..
-		*/
-		~ladspa_library() 
+		ladspa_library(std::string filename)
+		throw 
+		(
+			std::runtime_error
+		)
 		{
-			if (NULL != dl) 
-			{
-				/**
-				 * Destructors MUST NOT throw exceptions.
-				 */
-				try 
-				{
-					unload();
-				}
-				catch (std::runtime_error e)
-				{
-					std::cerr << "Warning: Library unloading failed. Maybe it was already unloaded?" << std::endl;
-				}
-			}
+			the_library = library_ptr(new library(filename));
+			init();
 		}
 		
-		void load() 
+		void init()
+		throw 
+		(
+			std::runtime_error
+		)
 		{
-			if (NULL != dl)
-			{
-				throw std::runtime_error("Library already loaded: " + library);
-			}
-			
-			dlerror();
-			
-			dl = dlopen(library.c_str(), RTLD_NOW);
-			
-			if (NULL == dl) 
-			{
-				throw std::runtime_error("Failed to open library: " + library + ". dlerror: " + dlerror());
-			}
-			
-			ladspa_descriptor_fun = (LADSPA_Descriptor_Function)dlsym(dl, "ladspa_descriptor");
+			LADSPA_Descriptor_Function ladspa_descriptor_fun = (LADSPA_Descriptor_Function)dlsym(the_library->dl, "ladspa_descriptor");
 			
 			char *error = dlerror();
 			if (NULL != error) {
-				dlclose(dl);
 				throw std::runtime_error("Failed to lookup ladspa_descriptor. dlerror: " + std::string(error));
 			}
 			
@@ -98,44 +75,9 @@ namespace ladspapp
 				
 				std::cerr << "Plugin: " << descriptor->Label << std::endl;
 				
-				descriptors.push_back(descriptor);
+				ladspa_plugins.push_back(ladspa_plugin_ptr(new ladspa_plugin(descriptor)));
 				++index;
 			}
-		}
-		
-		void unload() 
-		{
-			if (NULL == dl)
-			{
-				throw std::runtime_error("Library already unloaded");
-			}
-			
-			dlclose(dl);
-			dl = NULL;
-		}
-		
-		std::vector<std::string> labels() 
-		{
-			std::vector<std::string> ret;
-			for (unsigned int index = 0; index < descriptors.size(); ++index) {
-				ret.push_back(descriptors[index]->Label);
-			}
-			
-			return ret;
-		}
-		
-		ladspa_plugin get_plugin(std::string label) {
-			for (unsigned int index = 0; index < descriptors.size(); ++index) {
-				if (descriptors[index]->Label == label) {
-					return get_plugin(index);
-				}
-			}
-		}
-		
-		ladspa_plugin get_plugin(unsigned int index) {
-			ladspa_plugin plugin(descriptors[index]);
-			
-			return plugin;
 		}
 	};
 	

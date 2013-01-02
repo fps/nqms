@@ -7,12 +7,19 @@
 #include <iostream>
 #include <boost/filesystem.hpp>
 #include <boost/shared_ptr.hpp>
+#include <boost/utility.hpp>
 
+#include <library.h>
 #include <ladspa_library.h>
 
 namespace ladspapp 
 {
-	inline std::string get_ladspa_path_from_environment(std::string environment_variable_name = "LADSPA_PATH") 
+
+	inline std::string get_ladspa_path_from_environment(std::string environment_variable_name = "LADSPA_PATH")
+	throw 
+	(
+		std::runtime_error
+	)
 	{
 		char *path = getenv(environment_variable_name.c_str());
 		
@@ -28,7 +35,8 @@ namespace ladspapp
 	 * Splits a path string at the separators and returns a vector<string> with
 	 * the components..
 	 */
-	inline std::vector<std::string> split_path(std::string path, char separator) {
+	inline std::vector<std::string> split_path(std::string path, char separator) 
+	{
 		std::vector<std::string> components;
 		std::stringstream stream(path);
 		
@@ -56,9 +64,12 @@ namespace ladspapp
 	 */
 	inline std::vector<ladspa_library_ptr> ladspa_world_scan
 	(
-		bool load_libraries = false, 
-		std::string ladspa_path = get_ladspa_path_from_environment()
-	) 
+		std::string ladspa_path
+	)
+	throw 
+	(
+		std::runtime_error
+	)
 	{
 		std::vector<std::string> ladspa_path_components = split_path(ladspa_path, ':');
 	
@@ -68,7 +79,7 @@ namespace ladspapp
 		{
 			for (unsigned int index = 0; index < ladspa_path_components.size(); ++index) 
 			{
-				// std::cout << "LADSPA_PATH component: " << ladspa_path_components[index] << std::endl;
+				std::cerr << "LADSPA_PATH component: " << ladspa_path_components[index] << std::endl;
 				
 				boost::filesystem::path path(ladspa_path_components[index]);
 				
@@ -84,10 +95,11 @@ namespace ladspapp
 					++it
 				)
 				{
-					// std::cout << (*it).path().c_str() << std::endl;
+					std::cerr << "LADSPA library: " << (*it).path().c_str() << std::endl;
 					try
 					{
-						libraries.push_back(ladspa_library_ptr(new ladspa_library((*it).path().c_str(), load_libraries)));
+						library_ptr the_library(new library((*it).path().c_str()));
+						libraries.push_back(ladspa_library_ptr(new ladspa_library(the_library)));
 					}
 					catch (std::runtime_error e) 
 					{

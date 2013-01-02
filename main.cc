@@ -59,7 +59,9 @@ int main(int argc, char *argv[])
 		
 		engine e(polyphony);
 		
-		std::vector<ladspapp::ladspa_library_ptr> ladspa_libaries = ladspapp::ladspa_world_scan(true);
+		ladspapp::ladspa_world the_ladspa_world;
+		
+		the_ladspa_world.ladspa_libraries[0]->ladspa_plugins[0]->instantiate();
 		
 #if 0
 		//! TEST
