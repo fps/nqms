@@ -4,30 +4,32 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/utility.hpp>
 #include <ladspa.h>
+#include "ladspa_library.h"
 
-#include <library.h>
+#include <ladspa_plugin.h>
 
-struct ladspa_plugin_instance : boost::noncopyable {
-	library_ptr the_library;
-	LADSPA_Descriptor *descriptor;
-	
-    ladspa_plugin_instance
-    (
-		library_ptr the_library,
-		LADSPA_Descriptor *descriptor
-	)
-	throw 
-	(
-		std::runtime_error
-	)
-	:
-		the_library(the_library),
-		descriptor(descriptor)
-	{
+namespace ladspapp 
+{
+	struct ladspa_plugin_instance : boost::noncopyable {
+		ladspa_plugin_ptr the_ladspa_plugin;
+		LADSPA_Handle handle;
 		
-	}
-};
+		ladspa_plugin_instance
+		(
+			ladspa_plugin_ptr ladspa_plugin,
+			unsigned long samplerate
+		)
+		throw 
+		(
+			std::runtime_error
+		)
+		:
+			the_ladspa_plugin(the_ladspa_plugin)
+		{
+				handle = the_ladspa_plugin->descriptor->instantiate(the_ladspa_plugin->descriptor, samplerate);
+		}
+	};
 
-typedef boost::shared_ptr<ladspa_plugin_instance> ladspa_plugin_instance_ptr;
-
+	typedef boost::shared_ptr<ladspa_plugin_instance> ladspa_plugin_instance_ptr;
+} // namespace
 #endif

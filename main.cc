@@ -11,6 +11,7 @@
 #include <engine.h>
 #include <assign.h>
 #include <ladspa_world.h>
+#include <ladspa_plugin_instance.h>
 #include <ladspa_module.h>
 
 int main(int argc, char *argv[]) 
@@ -61,7 +62,7 @@ int main(int argc, char *argv[])
 		
 		ladspapp::ladspa_world the_ladspa_world;
 		
-		the_ladspa_world.ladspa_libraries[0]->ladspa_plugins[0]->instantiate();
+		ladspapp::ladspa_plugin_instance plugin_instance(the_ladspa_world.ladspa_libraries[0]->ladspa_plugins[0], e.samplerate());
 		
 #if 0
 		//! TEST

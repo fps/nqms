@@ -5,7 +5,6 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/utility.hpp>
 #include <ladspa.h>
-#include <ladspa_plugin_instance.h>
 
 namespace ladspapp 
 {
@@ -46,10 +45,6 @@ namespace ladspapp
 		unsigned long uid()
 		{
 			return descriptor->UniqueID;
-		}
-		
-		ladspa_plugin_instance_ptr instantiate() {
-			return ladspa_plugin_instance_ptr();
 		}
 	};
 	
