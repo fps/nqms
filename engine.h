@@ -22,6 +22,8 @@ extern "C" {
 
 struct engine 
 {
+	unsigned int polyphony;
+	
 	jack_client_t *jack_client;
 	
 	ringbuffer<boost::function<void()> > cmds;
@@ -32,15 +34,12 @@ struct engine
 	boost::shared_ptr<std::list<module_ptr> > modules;
 	std::map<module_ptr, std::vector<jack_port_t*> > module_jack_ports;
 	
-	unsigned int control_period;
-	unsigned int elapsed_frames;
-	
-	engine(unsigned int control_period) 
+	engine(unsigned int polyphony) 
 	:
+		polyphony(polyphony),
 		cmds(1024),
 		acks(1024),
-		modules(new std::list<module_ptr>),
-		elapsed_frames(0)
+		modules(new std::list<module_ptr>)
 	{
 		std::cerr << "Engine starting up..." << std::endl;
 		jack_status_t status;

@@ -4,11 +4,13 @@
 #include <iostream>
 #include <string>
 #include <fstream>
+#include <vector>
 #include <stdexcept>
 #include <cstdlib>
 
 #include <engine.h>
 #include <assign.h>
+#include <ladspa_world.h>
 #include <ladspa_module.h>
 
 int main(int argc, char *argv[]) 
@@ -28,7 +30,6 @@ int main(int argc, char *argv[])
 	desc.add_options()
 		("help,h", "Display help output")
 		("polyphony,p", po::value<int>()->default_value(1), "Polyphony for the patch")
-		("control-period,c", po::value<int>()->default_value(1), "The period (samples) for control rate signals")
 		;
 		
 	po::variables_map vm;
@@ -54,10 +55,11 @@ int main(int argc, char *argv[])
 	
 	try 
 	{
-		unsigned int control_period = vm["control-period"].as<int>();
 		unsigned int polyphony = vm["polyphony"].as<int>();
 		
-		engine e(control_period);
+		engine e(polyphony);
+		
+		std::vector<ladspapp::ladspa_library_ptr> ladspa_libaries = ladspapp::ladspa_world_scan(true);
 		
 #if 0
 		//! TEST
@@ -78,8 +80,8 @@ int main(int argc, char *argv[])
 #endif
 
 		{
-			ladspa_module_ptr module(new ladspa_module("/usr/lib/ladspa/cmt.so", "syndrum", e.samplerate(), polyphony));
-			e.add_module(module);
+			//ladspa_module_ptr module(new ladspa_module("/usr/lib/ladspa/cmt.so", "syndrum", e.samplerate(), polyphony));
+			//e.add_module(module);
 		}
 
 		ifstream input("/dev/stdin");
@@ -91,7 +93,7 @@ int main(int argc, char *argv[])
 			
 			e.cleanup_heap();
 		}
-	} 
+	}
 	
 	catch (runtime_error e) {
 		cerr << e.what() << endl;

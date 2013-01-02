@@ -7,44 +7,39 @@
 #include <ladspa.h>
 #include <iostream>
 #include <vector>
-#include <dlfcn.h>
 #include <utility>
 
 #include <module.h>
+#include <ladspa_plugin.h>
+#include <ladspa_library.h>
+
 
 struct ladspa_module;
 
 typedef boost::shared_ptr<ladspa_module> ladspa_module_ptr;
 
-struct ladspa_module : module 
+struct ladspa_module : module
 {
-	const LADSPA_Descriptor *descriptor;
+	ladspapp::ladspa_plugin plugin;
+	
+	unsigned int samplerate;
+
 	std::vector<LADSPA_Handle> instances;
 	std::vector<LADSPA_Data> defaults;
 
-	unsigned int samplerate;
 	ladspa_module
 	(
-		std::string library, 
-		std::string label, 
+		ladspapp::ladspa_plugin plugin,
 		unsigned int samplerate, 
 		unsigned int polyphony
 	) 
 	:
+		plugin(plugin),
 		samplerate(samplerate)
 	{
 		instances.resize(polyphony);
 		
-		void *dl = dlopen(library.c_str(), RTLD_NOW);
-		
-		if (NULL == dl) 
-		{
-			throw std::runtime_error("Failed to open library: " + library);
-		}
-		
-		LADSPA_Descriptor_Function ladspa_descriptor_fun;
-		ladspa_descriptor_fun = (LADSPA_Descriptor_Function)dlsym(dl, "ladspa_descriptor");
-		
+#if 0
 		int index = 0;
 		while(true) 
 		{
@@ -75,6 +70,7 @@ struct ladspa_module : module
 				defaults.push_back(0);
 			}
 		}
+#endif
 	}
 	
 	~ladspa_module() 
@@ -84,6 +80,7 @@ struct ladspa_module : module
 	
 	virtual void process(jack_nframes_t nframes)
 	{
+#if 0
 		for (jack_nframes_t frame = 0; frame < nframes; ++frame) {
 			unsigned int audio_in = 0;
 			unsigned int audio_out = 0;
@@ -104,6 +101,7 @@ struct ladspa_module : module
 				descriptor->run(instances[instance_index], 1);
 			}
 		}
+#endif
 	}
 	
 	static std::pair<std::string, std::string> find_plugin(std::string label_regex) 
@@ -113,6 +111,7 @@ struct ladspa_module : module
 	
 	LADSPA_Data get_port_default(unsigned int port_index) 
 	{
+#if 0
 		LADSPA_PortRangeHintDescriptor x = descriptor->PortRangeHints[port_index].HintDescriptor;
 		float def = 0.0f;
 		if (LADSPA_IS_HINT_BOUNDED_BELOW(x)) { }
@@ -186,6 +185,8 @@ struct ladspa_module : module
 			
 		}
 		return def;
+#endif
+		return 0;
 	}
 };
 
