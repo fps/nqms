@@ -54,7 +54,10 @@ int main(int argc, char *argv[])
 	
 	try 
 	{
-		engine e(vm["control-period"].as<int>());
+		unsigned int control_period = vm["control-period"].as<int>();
+		unsigned int polyphony = vm["polyphony"].as<int>();
+		
+		engine e(control_period);
 		
 #if 0
 		//! TEST
@@ -75,7 +78,7 @@ int main(int argc, char *argv[])
 #endif
 
 		{
-			ladspa_module_ptr module(new ladspa_module("/usr/lib/ladspa/calf.so", "Compressor", vm["polyphony"].as<int>()));
+			ladspa_module_ptr module(new ladspa_module("/usr/lib/ladspa/cmt.so", "syndrum", e.samplerate(), polyphony));
 			e.add_module(module);
 		}
 

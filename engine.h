@@ -39,6 +39,7 @@ struct engine
 	:
 		cmds(1024),
 		acks(1024),
+		modules(new std::list<module_ptr>),
 		elapsed_frames(0)
 	{
 		std::cerr << "Engine starting up..." << std::endl;
@@ -157,6 +158,11 @@ struct engine
 		/**
 		 * Remove the module's jack ports
 		 */
+	}
+	
+	unsigned int samplerate() 
+	{
+		return jack_get_sample_rate(jack_client);
 	}
 };
 

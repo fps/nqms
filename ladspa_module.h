@@ -5,6 +5,7 @@
 #include <stdexcept>
 #include <string>
 #include <ladspa.h>
+#include <iostream>
 #include <vector>
 #include <dlfcn.h>
 #include <utility>
@@ -21,17 +22,25 @@ struct ladspa_module : module
 	std::vector<LADSPA_Handle> instances;
 	std::vector<LADSPA_Data> defaults;
 
+	unsigned int samplerate;
 	ladspa_module
 	(
 		std::string library, 
 		std::string label, 
 		unsigned int samplerate, 
-		unsigned int polyphony = 1
+		unsigned int polyphony
 	) 
+	:
+		samplerate(samplerate)
 	{
 		instances.resize(polyphony);
 		
 		void *dl = dlopen(library.c_str(), RTLD_NOW);
+		
+		if (NULL == dl) 
+		{
+			throw std::runtime_error("Failed to open library: " + library);
+		}
 		
 		LADSPA_Descriptor_Function ladspa_descriptor_fun;
 		ladspa_descriptor_fun = (LADSPA_Descriptor_Function)dlsym(dl, "ladspa_descriptor");
@@ -51,8 +60,21 @@ struct ladspa_module : module
 			}
 			++index;
 		}
-		// std::cout << descriptor->Label << std::endl;
-
+		std::cerr << descriptor->Label << std::endl;
+		
+		for (unsigned int index = 0; index < descriptor->PortCount; ++index) {
+			if (LADSPA_IS_PORT_INPUT(descriptor->PortDescriptors[index])) {
+				in_port_buffers.push_back(0);
+				in_port_descriptions.push_back("");
+				in_port_names.push_back(descriptor->PortNames[index]);
+				defaults.push_back(get_port_default(index));
+			} else {
+				out_port_buffers.push_back(0);
+				out_port_descriptions.push_back("");
+				out_port_names.push_back(descriptor->PortNames[index]);
+				defaults.push_back(0);
+			}
+		}
 	}
 	
 	~ladspa_module() 
@@ -62,11 +84,108 @@ struct ladspa_module : module
 	
 	virtual void process(jack_nframes_t nframes)
 	{
+		for (jack_nframes_t frame = 0; frame < nframes; ++frame) {
+			unsigned int audio_in = 0;
+			unsigned int audio_out = 0;
 		
+			for (unsigned int instance_index = 0; instance_index < instances.size(); ++instance_index)
+			{
+				for (unsigned int port_index = 0; port_index < descriptor->PortCount; ++port_index) 
+				{
+					if (LADSPA_IS_PORT_INPUT(descriptor->PortDescriptors[port_index])) 
+					{
+						descriptor->connect_port(instances[instance_index], port_index, in_port_buffers[audio_in++] + frame);
+					} 
+					else 
+					{
+						descriptor->connect_port(instances[instance_index], port_index, out_port_buffers[audio_out++] + frame);
+					}
+				}
+				descriptor->run(instances[instance_index], 1);
+			}
+		}
 	}
 	
-	static std::pair<std::string, std::string> find_plugin(std::string label_regex) {
+	static std::pair<std::string, std::string> find_plugin(std::string label_regex) 
+	{
 		return std::make_pair("", "");
+	}
+	
+	LADSPA_Data get_port_default(unsigned int port_index) 
+	{
+		LADSPA_PortRangeHintDescriptor x = descriptor->PortRangeHints[port_index].HintDescriptor;
+		float def = 0.0f;
+		if (LADSPA_IS_HINT_BOUNDED_BELOW(x)) { }
+		if (LADSPA_IS_HINT_BOUNDED_ABOVE(x)) { }
+		if (LADSPA_IS_HINT_TOGGLED(x)) { }
+		if (LADSPA_IS_HINT_LOGARITHMIC(x)) { }
+		if (LADSPA_IS_HINT_INTEGER(x)) { } 
+
+		if (LADSPA_IS_HINT_DEFAULT_440(x)) {
+			return 440.0f;
+		}
+		if (LADSPA_IS_HINT_DEFAULT_100(x)) {
+			return 100.0f;
+		}
+		if (LADSPA_IS_HINT_DEFAULT_1(x)) {
+			return  1.0f;
+		}
+		if (LADSPA_IS_HINT_DEFAULT_0(x)) {
+			return  0.0f;
+		}
+		
+		if (LADSPA_IS_HINT_SAMPLE_RATE(x)) 
+		{ 
+			if (LADSPA_IS_HINT_DEFAULT_MINIMUM(x)) {
+				def =  descriptor->PortRangeHints[port_index].LowerBound;
+			}
+											
+			if (LADSPA_IS_HINT_DEFAULT_LOW(x)) { 
+				def =  (descriptor->PortRangeHints[port_index].UpperBound + descriptor->PortRangeHints[port_index].LowerBound) / 2;
+			}   
+											
+			if (LADSPA_IS_HINT_DEFAULT_MIDDLE(x)) { 
+				def = (descriptor->PortRangeHints[port_index].UpperBound + descriptor->PortRangeHints[port_index].LowerBound) / 2;
+			}
+												
+			if (LADSPA_IS_HINT_DEFAULT_HIGH(x)) {
+				def =  (descriptor->PortRangeHints[port_index].UpperBound + descriptor->PortRangeHints[port_index].LowerBound) / 2;
+			}   
+											
+			if (LADSPA_IS_HINT_DEFAULT_MAXIMUM(x)) { 
+				def =  descriptor->PortRangeHints[port_index].UpperBound;
+			}
+			return samplerate * def; 
+		} 
+		else 
+		{
+			if (LADSPA_IS_HINT_DEFAULT_MINIMUM(x)) 
+			{
+				def =  descriptor->PortRangeHints[port_index].LowerBound;
+			}
+											
+			if (LADSPA_IS_HINT_DEFAULT_LOW(x)) 
+			{ 
+				def =  (descriptor->PortRangeHints[port_index].UpperBound + descriptor->PortRangeHints[port_index].LowerBound) / 2;
+			}   
+											
+			if (LADSPA_IS_HINT_DEFAULT_MIDDLE(x)) 
+			{ 
+				def = (descriptor->PortRangeHints[port_index].UpperBound + descriptor->PortRangeHints[port_index].LowerBound) / 2;
+			}
+												
+			if (LADSPA_IS_HINT_DEFAULT_HIGH(x)) 
+			{
+				def =  (descriptor->PortRangeHints[port_index].UpperBound + descriptor->PortRangeHints[port_index].LowerBound) / 2;
+			}   
+											
+			if (LADSPA_IS_HINT_DEFAULT_MAXIMUM(x)) 
+			{ 
+				def =  descriptor->PortRangeHints[port_index].UpperBound;
+			}
+			
+		}
+		return def;
 	}
 };
 
