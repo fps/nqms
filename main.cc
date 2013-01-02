@@ -7,6 +7,8 @@
 #include <vector>
 #include <stdexcept>
 #include <cstdlib>
+#include <readline/readline.h>
+#include <readline/history.h>
 
 #include <engine.h>
 #include <assign.h>
@@ -89,15 +91,17 @@ int main(int argc, char *argv[])
 			//e.add_module(module);
 		}
 
-		ifstream input("/dev/stdin");
-		
-		while(input.good()) {
-			string line;
-			getline(input, line);
-			cout << line << endl;
+		char *line;
+		while (NULL != (line = readline("> ")))
+		{
+			if (line != std::string())
+			{
+				add_history(line);
+			}
 			
 			e.cleanup_heap();
 		}
+		
 	}
 	
 	catch (runtime_error e) {
