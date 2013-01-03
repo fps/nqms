@@ -5,7 +5,7 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/utility.hpp>
 #include <ladspa.h>
-
+#include <iostream>
 #include <library.h>
 
 namespace ladspapp 
@@ -26,7 +26,7 @@ namespace ladspapp
 			the_library(the_library),
 			descriptor(descriptor)
 		{
-			
+			std::cerr << uid() << "\t" << label() << "\t" << name() << " " << maker() << std::endl;
 		}
 		
 		std::string label() 
@@ -37,6 +37,11 @@ namespace ladspapp
 		std::string name()
 		{
 			return descriptor->Name;
+		}
+		
+		std::string maker()
+		{
+			return descriptor->Maker;
 		}
 		
 		unsigned long uid()

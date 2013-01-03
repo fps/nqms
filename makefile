@@ -5,10 +5,10 @@ PREFIX ?= /usr/local
 
 CXX ?= g++
 
-CXXFLAGS ?= -I . -g -ffast-math -mtune=native -Wall -fPIC `pkg-config --cflags jack`
+CXXFLAGS ?= -I . -g -ffast-math -mtune=native -Wall -fPIC `pkg-config --cflags jack ladspamm-0`
 CFLAGS ?= $(CXXFLAGS)
 
-LDFLAGS ?= -ldl `pkg-config --libs jack` -lboost_program_options -lboost_filesystem -lboost_system -lboost_regex -lreadline -Wl,-rpath=$(PREFIX)/lib
+LDFLAGS ?= -ldl `pkg-config --libs jack ladspamm-0` -lboost_program_options -lboost_filesystem -lboost_system -lboost_regex -lreadline -Wl,-rpath=$(PREFIX)/lib
 
 all: nqms
 

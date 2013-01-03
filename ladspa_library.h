@@ -68,7 +68,7 @@ namespace ladspapp
 					break;
 				}
 				
-				std::cerr << "Plugin: " << descriptor->Label << std::endl;
+				// std::cerr << "Plugin: " << descriptor->Label << std::endl;
 				
 				ladspa_plugins.push_back(ladspa_plugin_ptr(new ladspa_plugin(the_library, descriptor)));
 				++index;
