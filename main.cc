@@ -9,11 +9,11 @@
 #include <cstdlib>
 #include <readline/readline.h>
 #include <readline/history.h>
+#include <ladspamm-0/world.h>
+#include <ladspamm-0/plugin_instance.h>
 
 #include <engine.h>
 #include <assign.h>
-#include <ladspa_world.h>
-#include <ladspa_plugin_instance.h>
 #include <ladspa_module.h>
 
 int main(int argc, char *argv[]) 
@@ -61,8 +61,8 @@ int main(int argc, char *argv[])
 		unsigned int polyphony = vm["polyphony"].as<int>();
 		engine e(polyphony);
 		
-		ladspapp::ladspa_world the_ladspa_world;
-		ladspapp::ladspa_plugin_instance plugin_instance(the_ladspa_world.ladspa_libraries[1]->ladspa_plugins[0], e.samplerate());
+		ladspamm::world the_ladspa_world;
+		ladspamm::plugin_instance plugin_instance(the_ladspa_world.libraries[1]->plugins[0], e.samplerate());
 		
 #if 0
 		//! TEST

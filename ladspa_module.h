@@ -10,8 +10,8 @@
 #include <utility>
 
 #include <module.h>
-#include <ladspa_plugin.h>
-#include <ladspa_library.h>
+#include <ladspamm-0/plugin.h>
+#include <ladspamm-0/library.h>
 
 
 struct ladspa_module;
@@ -20,7 +20,7 @@ typedef boost::shared_ptr<ladspa_module> ladspa_module_ptr;
 
 struct ladspa_module : module
 {
-	ladspapp::ladspa_plugin_ptr plugin;
+	ladspamm::plugin_ptr plugin;
 	
 	unsigned int samplerate;
 
@@ -29,7 +29,7 @@ struct ladspa_module : module
 
 	ladspa_module
 	(
-		ladspapp::ladspa_plugin_ptr plugin,
+		ladspamm::plugin_ptr plugin,
 		unsigned int samplerate, 
 		unsigned int polyphony
 	) 

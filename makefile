@@ -12,6 +12,6 @@ LDFLAGS ?= -ldl `pkg-config --libs jack ladspamm-0` -lboost_program_options -lbo
 
 all: nqms
 
-nqms: main.cc module.h ladspa_module.h engine.h makefile ringbuffer.h assign.h disposable.h ladspa_plugin.h ladspa_library.h ladspapp.h library.h ladspa_plugin_instance.h ladspa_world.h
+nqms: main.cc module.h ladspa_module.h engine.h makefile ringbuffer.h assign.h disposable.h 
 	$(CXX) $(CXXFLAGS) -o nqms main.cc $(LDFLAGS)
 
