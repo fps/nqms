@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # NQMS - The Not Quite Modular Synth
 
 This program is a simple LADSPA host designed to be usable from the commandline without a graphical user interface. It sports a simple readline based interface for loading and connecting plugins. The task of providing the dataflow is realized by using jack ports and connections..
@@ -95,4 +94,3 @@ nqms
 ====
 
 The not quite modular synth - a simple modular synth with a readline interface
->>>>>>> 98725d689c9a83903fcab5fc24ec10342e52adeb
