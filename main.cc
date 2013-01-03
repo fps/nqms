@@ -59,13 +59,9 @@ int main(int argc, char *argv[])
 	try 
 	{
 		unsigned int polyphony = vm["polyphony"].as<int>();
-		
 		engine e(polyphony);
 		
 		ladspapp::ladspa_world the_ladspa_world;
-		
-		std::cout << "There are " << the_ladspa_world.ladspa_libraries.size() << " libraries" << std::endl;
-		
 		ladspapp::ladspa_plugin_instance plugin_instance(the_ladspa_world.ladspa_libraries[1]->ladspa_plugins[0], e.samplerate());
 		
 #if 0
