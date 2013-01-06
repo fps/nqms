@@ -42,7 +42,6 @@ struct engine
 	engine
 	(
 		unsigned int polyphony,
-		unsigned int midi_ports,
 		unsigned int audio_ports
 	) 
 	:

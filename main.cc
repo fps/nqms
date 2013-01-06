@@ -52,10 +52,9 @@ int main(int argc, char *argv[])
 	try 
 	{
 		unsigned int polyphony = vm["polyphony"].as<int>();
-		unsigned int midi_ports = vm["midi-ports"].as<int>();
 		unsigned int audio_ports = vm["audio-ports"].as<int>();
 
-		engine e(polyphony, midi_ports, audio_ports);
+		engine e(polyphony, audio_ports);
 		
 		ladspamm::world the_ladspa_world;
 		
