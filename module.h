@@ -24,15 +24,6 @@ struct module : disposable
 	std::vector<std::string> in_port_names;
 	std::vector<std::string> out_port_names;
 
-	std::vector<std::string> in_port_descriptions;
-	std::vector<std::string> out_port_descriptions;
-
-	/**
-	 * Values that get added to the input. These 
-	 * should be set to default values by subclasses.
-	 */
-	std::vector<float> in_port_values;
-		
 	virtual ~module() 
 	{ 
 		

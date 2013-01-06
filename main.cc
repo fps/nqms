@@ -67,8 +67,10 @@ int main(int argc, char *argv[])
 		engine e(polyphony, midi_ports, audio_ports);
 		
 		ladspamm::world the_ladspa_world;
-		ladspamm::plugin_instance plugin_instance(the_ladspa_world.libraries[1]->plugins[0], e.samplerate());
-
+		
+		ladspa_module_ptr m(new ladspa_module(the_ladspa_world.libraries[1]->plugins[0], e.samplerate(), e.polyphony));
+		e.add_module(m);
+		
 		char *line;
 		while (NULL != (line = readline("> ")))
 		{

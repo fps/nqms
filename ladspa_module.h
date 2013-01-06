@@ -36,40 +36,22 @@ struct ladspa_module : module
 		plugin(plugin),
 		samplerate(samplerate)
 	{
-		instances.resize(polyphony);
-		
-#if 0
-		int index = 0;
-		while(true) 
+		for (unsigned int index = 0; index < polyphony; ++index)
 		{
-			descriptor = ladspa_descriptor_fun(index);
-			if (0 == descriptor) 
-			{
-				throw std::runtime_error("Plugin not found with label: " + label);
-			}
-			
-			if (label == descriptor->Label) 
-			{
-				break;
-			}
-			++index;
+			instances.push_back(ladspamm::plugin_instance_ptr(new ladspamm::plugin_instance(plugin, samplerate)));
 		}
-		std::cerr << descriptor->Label << std::endl;
-		
-		for (unsigned int index = 0; index < descriptor->PortCount; ++index) {
-			if (LADSPA_IS_PORT_INPUT(descriptor->PortDescriptors[index])) {
+
+		for (unsigned int index = 0; index < plugin->port_count(); ++index) {
+			if (plugin->port_is_input(index)) {
 				in_port_buffers.push_back(0);
-				in_port_descriptions.push_back("");
-				in_port_names.push_back(descriptor->PortNames[index]);
-				defaults.push_back(get_port_default(index));
+				in_port_names.push_back(plugin->port_name(index));
+				defaults.push_back(instances[0]->port_default_guessed(index));
 			} else {
 				out_port_buffers.push_back(0);
-				out_port_descriptions.push_back("");
-				out_port_names.push_back(descriptor->PortNames[index]);
+				out_port_names.push_back(plugin->port_name(index));
 				defaults.push_back(0);
 			}
 		}
-#endif
 	}
 	
 	~ladspa_module() 
