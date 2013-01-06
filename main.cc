@@ -19,14 +19,6 @@
 int main(int argc, char *argv[]) 
 {
 	namespace po = boost::program_options;
-	using std::cout;
-	using std::cerr;
-	using std::endl;
-	using std::ifstream;
-	using std::getline;
-	using std::string;
-	using std::runtime_error;
-	using std::exception;
 	
 	po::options_description desc;
 	
@@ -44,17 +36,17 @@ int main(int argc, char *argv[])
 		po::store(po::parse_command_line(argc, argv, desc), vm);
 		
 		if (vm.count("help")) {
-			cout << desc << endl;
+			std::cout << desc << std::endl;
 			return(EXIT_SUCCESS);
 		}
 	
 		po::notify(vm);
 	} 
 	
-	catch (po::error e) 
+	catch (po::error &e) 
 	{
-		cerr << e.what() << endl;
-		cerr << "Exiting..." << endl;
+		std::cerr << e.what() << std::endl;
+		std::cerr << "Exiting..." << std::endl;
 		return (EXIT_FAILURE);
 	}
 	
@@ -84,9 +76,10 @@ int main(int argc, char *argv[])
 		
 	}
 	
-	catch (runtime_error e) {
-		cerr << e.what() << endl;
-		cerr << "Exiting..." << endl;
+	catch (std::runtime_error &e) 
+	{
+		std::cerr << e.what() << std::endl;
+		std::cerr << "Exiting..." << std::endl;
 		return (EXIT_FAILURE);
 	}
 	
