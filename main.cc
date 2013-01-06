@@ -33,6 +33,8 @@ int main(int argc, char *argv[])
 	desc.add_options()
 		("help,h", "Display help output")
 		("polyphony,p", po::value<int>()->default_value(1), "Polyphony for the patch")
+		("midi-ports,m", po::value<int>()->default_value(1), "Number of midi ports (in and out)")
+		("audio-ports,a", po::value<int>()->default_value(2), "Number of audio ports (in and out)")
 		;
 		
 	po::variables_map vm;
@@ -59,33 +61,13 @@ int main(int argc, char *argv[])
 	try 
 	{
 		unsigned int polyphony = vm["polyphony"].as<int>();
-		engine e(polyphony);
+		unsigned int midi_ports = vm["midi-ports"].as<int>();
+		unsigned int audio_ports = vm["audio-ports"].as<int>();
+
+		engine e(polyphony, midi_ports, audio_ports);
 		
 		ladspamm::world the_ladspa_world;
 		ladspamm::plugin_instance plugin_instance(the_ladspa_world.libraries[1]->plugins[0], e.samplerate());
-		
-#if 0
-		//! TEST
-		{
-			state_ptr new_state1(new state(vm["polyphony"].as<int>()));
-			e.set_state(new_state1);
-			state_ptr new_state2(new state(vm["polyphony"].as<int>()));
-			e.set_state(new_state2);
-			state_ptr new_state3(new state(vm["polyphony"].as<int>()));
-			e.set_state(new_state3);
-			state_ptr new_state4(new state(vm["polyphony"].as<int>()));
-			e.set_state(new_state4);
-			state_ptr new_state5(new state(vm["polyphony"].as<int>()));
-			e.set_state(new_state5);
-			state_ptr new_state6(new state(vm["polyphony"].as<int>()));
-			e.set_state(new_state6);
-		}
-#endif
-
-		{
-			//ladspa_module_ptr module(new ladspa_module("/usr/lib/ladspa/cmt.so", "syndrum", e.samplerate(), polyphony));
-			//e.add_module(module);
-		}
 
 		char *line;
 		while (NULL != (line = readline("> ")))

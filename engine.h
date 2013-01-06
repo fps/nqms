@@ -10,6 +10,7 @@
 #include <iostream>
 #include <unistd.h>
 #include <map>
+#include <sstream>
 
 #include <ringbuffer.h>
 #include <assign.h>
@@ -32,9 +33,19 @@ struct engine
 	std::list<disposable_ptr> heap;
 	
 	boost::shared_ptr<std::list<module_ptr> > modules;
-	std::map<module_ptr, std::vector<jack_port_t*> > module_jack_ports;
+
+	std::vector<jack_port_t*> midi_in_ports;
+	std::vector<jack_port_t*> midi_out_ports;
+
+	std::vector<jack_port_t*> audio_in_ports;
+	std::vector<jack_port_t*> audio_out_ports;
 	
-	engine(unsigned int polyphony) 
+	engine
+	(
+		unsigned int polyphony,
+		unsigned int midi_ports,
+		unsigned int audio_ports
+	) 
 	:
 		polyphony(polyphony),
 		cmds(1024),
@@ -50,6 +61,51 @@ struct engine
 			throw std::runtime_error("Failed to open jack client");
 		}
 		
+		midi_in_ports.resize(midi_ports);
+		midi_out_ports.resize(midi_ports);
+		
+		audio_in_ports.resize(audio_ports);
+		audio_out_ports.resize(audio_ports);
+
+		for (unsigned int index = 0; index < midi_ports; ++index)
+		{
+			{
+				std::stringstream name_stream;
+				name_stream << "midi_in_" << index;
+				if (NULL == (midi_in_ports[index] = jack_port_register(jack_client, name_stream.str().c_str(), JACK_DEFAULT_MIDI_TYPE, JackPortIsInput, 0)))
+				{
+					throw std::runtime_error("Failed to register port");
+				}
+			}
+			{
+				std::stringstream name_stream;
+				name_stream << "midi_out_" << index;
+				if (NULL == (midi_in_ports[index] = jack_port_register(jack_client, name_stream.str().c_str(), JACK_DEFAULT_MIDI_TYPE, JackPortIsOutput, 0)))
+				{
+					throw std::runtime_error("Failed to register port");
+				}
+			}
+		}
+		
+		for (unsigned int index = 0; index < audio_ports; ++index)
+		{
+			{
+				std::stringstream name_stream;
+				name_stream << "audio_in_" << index;
+				if (NULL == (audio_in_ports[index] = jack_port_register(jack_client, name_stream.str().c_str(), JACK_DEFAULT_AUDIO_TYPE, JackPortIsInput, 0)))
+				{
+					throw std::runtime_error("Failed to register port");
+				}
+			}
+			{
+				std::stringstream name_stream;
+				name_stream << "audio_out_" << index;
+				if (NULL == (audio_in_ports[index] = jack_port_register(jack_client, name_stream.str().c_str(), JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0)))
+				{
+					throw std::runtime_error("Failed to register port");
+				}
+			}
+		}
 		jack_set_process_callback(jack_client, ::process, (void*)this);
 		jack_activate(jack_client);
 	}

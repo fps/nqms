@@ -1,8 +1,6 @@
 # NQMS - The Not Quite Modular Synth
 
-This program is a simple LADSPA host designed to be usable from the commandline without a graphical user interface. It sports a simple readline based interface for loading and connecting plugins. The task of providing the dataflow is realized by using jack ports and connections..
-
-All plugins export all their ports via jack ports which allows patching from the outside if required. 
+This program is a simple LADSPA host designed to be usable from the commandline without a graphical user interface. It sports a simple readline based interface for loading and connecting plugins. 
 
 There is a very simple input language used to define patches. After loading modules every parameter is indexed in numerical form (see the list command below).
 

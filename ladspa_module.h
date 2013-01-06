@@ -10,8 +10,7 @@
 #include <utility>
 
 #include <module.h>
-#include <ladspamm-0/plugin.h>
-#include <ladspamm-0/library.h>
+#include <ladspamm-0/plugin_instance.h>
 
 
 struct ladspa_module;
@@ -24,7 +23,7 @@ struct ladspa_module : module
 	
 	unsigned int samplerate;
 
-	std::vector<LADSPA_Handle> instances;
+	std::vector<ladspamm::plugin_instance_ptr> instances;
 	std::vector<LADSPA_Data> defaults;
 
 	ladspa_module
@@ -107,86 +106,6 @@ struct ladspa_module : module
 	static std::pair<std::string, std::string> find_plugin(std::string label_regex) 
 	{
 		return std::make_pair("", "");
-	}
-	
-	LADSPA_Data get_port_default(unsigned int port_index) 
-	{
-#if 0
-		LADSPA_PortRangeHintDescriptor x = descriptor->PortRangeHints[port_index].HintDescriptor;
-		float def = 0.0f;
-		if (LADSPA_IS_HINT_BOUNDED_BELOW(x)) { }
-		if (LADSPA_IS_HINT_BOUNDED_ABOVE(x)) { }
-		if (LADSPA_IS_HINT_TOGGLED(x)) { }
-		if (LADSPA_IS_HINT_LOGARITHMIC(x)) { }
-		if (LADSPA_IS_HINT_INTEGER(x)) { } 
-
-		if (LADSPA_IS_HINT_DEFAULT_440(x)) {
-			return 440.0f;
-		}
-		if (LADSPA_IS_HINT_DEFAULT_100(x)) {
-			return 100.0f;
-		}
-		if (LADSPA_IS_HINT_DEFAULT_1(x)) {
-			return  1.0f;
-		}
-		if (LADSPA_IS_HINT_DEFAULT_0(x)) {
-			return  0.0f;
-		}
-		
-		if (LADSPA_IS_HINT_SAMPLE_RATE(x)) 
-		{ 
-			if (LADSPA_IS_HINT_DEFAULT_MINIMUM(x)) {
-				def =  descriptor->PortRangeHints[port_index].LowerBound;
-			}
-											
-			if (LADSPA_IS_HINT_DEFAULT_LOW(x)) { 
-				def =  (descriptor->PortRangeHints[port_index].UpperBound + descriptor->PortRangeHints[port_index].LowerBound) / 2;
-			}   
-											
-			if (LADSPA_IS_HINT_DEFAULT_MIDDLE(x)) { 
-				def = (descriptor->PortRangeHints[port_index].UpperBound + descriptor->PortRangeHints[port_index].LowerBound) / 2;
-			}
-												
-			if (LADSPA_IS_HINT_DEFAULT_HIGH(x)) {
-				def =  (descriptor->PortRangeHints[port_index].UpperBound + descriptor->PortRangeHints[port_index].LowerBound) / 2;
-			}   
-											
-			if (LADSPA_IS_HINT_DEFAULT_MAXIMUM(x)) { 
-				def =  descriptor->PortRangeHints[port_index].UpperBound;
-			}
-			return samplerate * def; 
-		} 
-		else 
-		{
-			if (LADSPA_IS_HINT_DEFAULT_MINIMUM(x)) 
-			{
-				def =  descriptor->PortRangeHints[port_index].LowerBound;
-			}
-											
-			if (LADSPA_IS_HINT_DEFAULT_LOW(x)) 
-			{ 
-				def =  (descriptor->PortRangeHints[port_index].UpperBound + descriptor->PortRangeHints[port_index].LowerBound) / 2;
-			}   
-											
-			if (LADSPA_IS_HINT_DEFAULT_MIDDLE(x)) 
-			{ 
-				def = (descriptor->PortRangeHints[port_index].UpperBound + descriptor->PortRangeHints[port_index].LowerBound) / 2;
-			}
-												
-			if (LADSPA_IS_HINT_DEFAULT_HIGH(x)) 
-			{
-				def =  (descriptor->PortRangeHints[port_index].UpperBound + descriptor->PortRangeHints[port_index].LowerBound) / 2;
-			}   
-											
-			if (LADSPA_IS_HINT_DEFAULT_MAXIMUM(x)) 
-			{ 
-				def =  descriptor->PortRangeHints[port_index].UpperBound;
-			}
-			
-		}
-		return def;
-#endif
-		return 0;
 	}
 };
 
