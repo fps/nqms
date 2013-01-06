@@ -25,7 +25,6 @@ int main(int argc, char *argv[])
 	desc.add_options()
 		("help,h", "Display help output")
 		("polyphony,p", po::value<int>()->default_value(1), "Polyphony for the patch")
-		("midi-ports,m", po::value<int>()->default_value(1), "Number of midi ports (in and out)")
 		("audio-ports,a", po::value<int>()->default_value(2), "Number of audio ports (in and out)")
 		;
 		
