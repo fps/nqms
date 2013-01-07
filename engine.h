@@ -16,6 +16,7 @@
 #include <assign.h>
 #include <disposable.h>
 #include <module.h>
+#include <midi_state.h>
 
 extern "C" {
 	int process(jack_nframes_t nframes, void *arg);
@@ -23,7 +24,7 @@ extern "C" {
 
 struct engine 
 {
-	unsigned int polyphony;
+	midi_state the_midi_state;
 	
 	jack_client_t *jack_client;
 	
@@ -45,7 +46,7 @@ struct engine
 		unsigned int audio_ports
 	) 
 	:
-		polyphony(polyphony),
+		the_midi_state(polyphony),
 		cmds(1024),
 		acks(1024),
 		modules(new std::list<module_ptr>)
@@ -199,6 +200,12 @@ struct engine
 	{
 		return jack_get_sample_rate(jack_client);
 	}
+
+	unsigned int polyphony() 
+	{
+		return the_midi_state.voices.size();
+	}
+
 };
 
 
