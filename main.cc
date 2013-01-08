@@ -58,7 +58,14 @@ int main(int argc, char *argv[])
 		
 		ladspamm::world the_ladspa_world;
 		
-		ladspa_module_ptr m(new ladspa_module(the_ladspa_world.libraries[1]->plugins[0], e.samplerate(), e.polyphony));
+		ladspa_module_ptr m(
+			new ladspa_module(
+				the_ladspa_world.libraries[1]->plugins[0], 
+				e.samplerate(), 
+				e.polyphony()
+			)
+		);
+		
 		e.add_module(m);
 		
 		char *line;
@@ -71,7 +78,6 @@ int main(int argc, char *argv[])
 			
 			e.cleanup_heap();
 		}
-		
 	}
 	
 	catch (std::runtime_error &e) 
