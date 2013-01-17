@@ -10,12 +10,14 @@
 
 struct module : disposable
 {
+	typedef boost::shared_ptr<std::vector<float> > buffer_ptr;
+	
 	/**
 	 * Subclasses must resize these to the
 	 * correct sizes..
 	 */
-	std::vector<float*> in_port_buffers;
-	std::vector<float*> out_port_buffers;
+	std::vector<buffer_ptr> in_port_buffers;
+	std::vector<buffer_ptr> out_port_buffers;
 	
 	/**
 	 * Subclasses must fill these with

@@ -43,11 +43,11 @@ struct ladspa_module : module
 
 		for (unsigned int index = 0; index < plugin->port_count(); ++index) {
 			if (plugin->port_is_input(index)) {
-				in_port_buffers.push_back(0);
+				in_port_buffers.push_back(buffer_ptr());
 				in_port_names.push_back(plugin->port_name(index));
 				defaults.push_back(instances[0]->port_default_guessed(index));
 			} else {
-				out_port_buffers.push_back(0);
+				out_port_buffers.push_back(buffer_ptr());
 				out_port_names.push_back(plugin->port_name(index));
 				defaults.push_back(0);
 			}
